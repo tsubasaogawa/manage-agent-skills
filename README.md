@@ -22,7 +22,6 @@ Simplify the installation and management of agent skills.
 
 ### Prerequisites
 
-- Go 1.22 or later
 - Git
 
 ### Download pre-built binaries
@@ -75,7 +74,7 @@ You can customize this file or create your own at `~/.config/manage-agent-skills
 
 ### Download a skill
 
-Download a skill from a GitHub repository:
+Download a skill from a GitHub repository (for example: <https://github.com/tsubasaogawa/semantic-commit-helper> skill)
 
 ```bash
 manage-agent-skills download github.com/tsubasaogawa/semantic-commit-helper
