@@ -10,7 +10,7 @@ import (
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List all downloaded skills",
-	Long:  `List all skills that have been downloaded to ~/.local/bin/manage-agent-skills`,
+	Long:  `List all skills that have been downloaded to ~/.local/src/manage-agent-skills`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		skillList, err := skills.List()
 		if err != nil {

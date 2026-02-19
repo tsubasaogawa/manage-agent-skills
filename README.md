@@ -13,10 +13,10 @@ Simplify the installation and management of agent skills.
 
 ## Features
 
-- **download**: Clone a GitHub repository (e.g., `github.com/tsubasaogawa/semantic-commit-helper`) to `~/.local/bin/manage-agent-skills`
+- **download**: Clone a GitHub repository (e.g., `github.com/tsubasaogawa/semantic-commit-helper`) to `~/.local/src/manage-agent-skills`
 - **install <agent name>**: Create symbolic links to cloned repositories in the specified agent's skill directory
   - Agent skill directory list is managed in `config.toml`
-- **list**: Display a list of skills cloned under `~/.local/bin/manage-agent-skills`
+- **list**: Display a list of skills cloned under `~/.local/src/manage-agent-skills`
 
 ## Installation
 
@@ -69,7 +69,7 @@ Download a skill from a GitHub repository:
 manage-agent-skills download github.com/tsubasaogawa/semantic-commit-helper
 ```
 
-This clones the repository to `~/.local/bin/manage-agent-skills/semantic-commit-helper`.
+This clones the repository to `~/.local/src/manage-agent-skills/semantic-commit-helper`.
 
 ### List downloaded skills
 
@@ -115,7 +115,7 @@ manage-agent-skills download --help
 ## Directory Structure
 
 ```
-~/.local/bin/manage-agent-skills/
+~/.local/src/manage-agent-skills/
 ├── semantic-commit-helper/   # Downloaded skill repository
 ├── another-skill/             # Downloaded skill repository
 └── ...
@@ -124,8 +124,8 @@ manage-agent-skills download --help
 └── config.toml                # Configuration file
 
 ~/.claude/skills/
-├── semantic-commit-helper -> ~/.local/bin/manage-agent-skills/semantic-commit-helper
-├── another-skill -> ~/.local/bin/manage-agent-skills/another-skill
+├── semantic-commit-helper -> ~/.local/src/manage-agent-skills/semantic-commit-helper
+├── another-skill -> ~/.local/src/manage-agent-skills/another-skill
 └── ...
 ```
 

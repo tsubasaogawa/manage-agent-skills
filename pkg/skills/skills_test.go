@@ -17,7 +17,7 @@ func TestGetSkillsDir(t *testing.T) {
 		t.Fatalf("Failed to get home directory: %v", err)
 	}
 
-	expected := filepath.Join(homeDir, ".local", "bin", "manage-agent-skills")
+	expected := filepath.Join(homeDir, ".local", "src", "manage-agent-skills")
 	if dir != expected {
 		t.Errorf("GetSkillsDir() = %q, want %q", dir, expected)
 	}
