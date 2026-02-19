@@ -47,15 +47,17 @@ go install github.com/tsubasaogawa/manage-agent-skills@latest
 
 ## Configuration
 
-Create a configuration file at `~/.config/manage-agent-skills/config.toml`:
+The repository includes a default configuration file (`config.toml`) with pre-configured agent skill directories for common AI assistants:
 
 ```toml
 [agents]
-my-agent = "~/.local/share/my-agent/skills"
-another-agent = "/opt/agents/another-agent/skills"
+claude = "~/.claude/skills/"
+codex = "~/.codex/skills/"
+gemini = "~/.gemini/skills/"
+copilot = "~/.copilot/skills/"
 ```
 
-Each entry maps an agent name to its skills directory path.
+You can customize this file or create your own at `~/.config/manage-agent-skills/config.toml`. Each entry maps an agent name to its skills directory path.
 
 ## Usage
 
@@ -89,7 +91,7 @@ Downloaded skills:
 Install all downloaded skills to a specific agent:
 
 ```bash
-manage-agent-skills install my-agent
+manage-agent-skills install claude
 ```
 
 This creates symbolic links in the agent's skill directory (as defined in `config.toml`) for all downloaded skills.
@@ -98,7 +100,7 @@ Output:
 ```
   Installed semantic-commit-helper
   Installed another-skill
-Successfully installed skills to agent 'my-agent'
+Successfully installed skills to agent 'claude'
 ```
 
 ### Help
@@ -121,7 +123,7 @@ manage-agent-skills download --help
 ~/.config/manage-agent-skills/
 └── config.toml                # Configuration file
 
-~/.local/share/my-agent/skills/
+~/.claude/skills/
 ├── semantic-commit-helper -> ~/.local/bin/manage-agent-skills/semantic-commit-helper
 ├── another-skill -> ~/.local/bin/manage-agent-skills/another-skill
 └── ...
