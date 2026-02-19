@@ -22,7 +22,7 @@ Simplify the installation and management of agent skills.
 
 ### Prerequisites
 
-- Go 1.20 or later
+- Go 1.22 or later
 - Git
 
 ### Build from source
