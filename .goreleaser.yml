@@ -26,6 +26,7 @@ builds:
       - goos: windows
         goarch: arm64
     ldflags:
+      # -s -w: Strip debug information and symbol table to reduce binary size
       - -s -w
       - -X main.version={{.Version}}
       - -X main.commit={{.Commit}}
@@ -48,6 +49,7 @@ archives:
     files:
       - LICENSE
       - README.md
+      # Include default config.toml as a template (users customize at ~/.config/manage-agent-skills/config.toml)
       - config.toml
 
 checksum:
