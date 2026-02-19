@@ -36,6 +36,44 @@ func TestList_EmptyDirectory(t *testing.T) {
 	}
 }
 
+func TestDelete_NotFound(t *testing.T) {
+	err := Delete("nonexistent-skill-xyz", []string{})
+	if err == nil {
+		t.Error("Delete() with nonexistent skill should return error")
+	}
+}
+
+func TestDelete_RemovesSkillAndSymlink(t *testing.T) {
+	// Use a temporary HOME so GetSkillsDir points to a controlled location
+	tmpHome := t.TempDir()
+	t.Setenv("HOME", tmpHome)
+
+	skillName := "test-skill"
+	skillsDir := filepath.Join(tmpHome, ".local", "src", "manage-agent-skills")
+	skillDir := filepath.Join(skillsDir, skillName)
+	if err := os.MkdirAll(skillDir, 0755); err != nil {
+		t.Fatalf("failed to create skill dir: %v", err)
+	}
+
+	// Set up a temporary agent directory with a symlink
+	agentDir := t.TempDir()
+	symlinkPath := filepath.Join(agentDir, skillName)
+	if err := os.Symlink(skillDir, symlinkPath); err != nil {
+		t.Fatalf("failed to create symlink: %v", err)
+	}
+
+	if err := Delete(skillName, []string{agentDir}); err != nil {
+		t.Fatalf("Delete() failed: %v", err)
+	}
+
+	if _, err := os.Lstat(symlinkPath); !os.IsNotExist(err) {
+		t.Error("symlink should not exist after delete")
+	}
+	if _, err := os.Stat(skillDir); !os.IsNotExist(err) {
+		t.Error("skill directory should not exist after delete")
+	}
+}
+
 func TestDownload_InvalidRepoFormat(t *testing.T) {
 	tests := []struct {
 		name string
