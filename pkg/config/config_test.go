@@ -60,20 +60,21 @@ copilot = "~/.copilot/skills"
 		if err := os.Rename(configPath, backupPath); err != nil {
 			t.Fatalf("Failed to backup config: %v", err)
 		}
-		defer func() {
+	}
+
+	// Cleanup after test
+	defer func() {
+		if configExists {
+			// Restore original config
 			if err := os.Rename(backupPath, configPath); err != nil {
 				t.Errorf("Failed to restore config: %v", err)
 			}
-		}()
-	}
-
-	if !configExists {
-		defer func() {
-			// Clean up the test config
+		} else {
+			// Clean up test config
 			os.Remove(configPath)
 			os.RemoveAll(filepath.Dir(configPath))
-		}()
-	}
+		}
+	}()
 
 	cfg, err := Load()
 	if err != nil {

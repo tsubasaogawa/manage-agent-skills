@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/pelletier/go-toml/v2"
 )
@@ -34,8 +35,13 @@ func downloadDefaultConfig(configPath string) error {
 		return fmt.Errorf("failed to create config directory: %w", err)
 	}
 
+	// Create HTTP client with timeout
+	client := &http.Client{
+		Timeout: 30 * time.Second,
+	}
+
 	// Download the config file
-	resp, err := http.Get(DefaultConfigURL)
+	resp, err := client.Get(DefaultConfigURL)
 	if err != nil {
 		return fmt.Errorf("failed to download config from %s: %w", DefaultConfigURL, err)
 	}
