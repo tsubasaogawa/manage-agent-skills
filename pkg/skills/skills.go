@@ -89,6 +89,53 @@ func List() ([]string, error) {
 	return skills, nil
 }
 
+// Delete removes a skill directory and any symlinks pointing to it from the given agent directories
+func Delete(skillName string, agentPaths []string) error {
+	skillsDir, err := GetSkillsDir()
+	if err != nil {
+		return err
+	}
+
+	skillDir := filepath.Join(skillsDir, skillName)
+
+	// Check if the skill exists
+	if _, err := os.Stat(skillDir); os.IsNotExist(err) {
+		return fmt.Errorf("skill '%s' not found", skillName)
+	}
+
+	// Remove symlinks from all agent directories
+	for _, agentPath := range agentPaths {
+		if strings.HasPrefix(agentPath, "~/") {
+			homeDir, err := os.UserHomeDir()
+			if err != nil {
+				return fmt.Errorf("failed to get home directory: %w", err)
+			}
+			agentPath = filepath.Join(homeDir, agentPath[2:])
+		}
+
+		symlinkPath := filepath.Join(agentPath, skillName)
+		info, err := os.Lstat(symlinkPath)
+		if err != nil {
+			// Symlink doesn't exist, skip
+			continue
+		}
+		if info.Mode()&os.ModeSymlink != 0 {
+			if err := os.Remove(symlinkPath); err != nil {
+				fmt.Printf("  Warning: failed to remove symlink %s: %v\n", symlinkPath, err)
+			} else {
+				fmt.Printf("  Removed symlink %s\n", symlinkPath)
+			}
+		}
+	}
+
+	// Remove the skill directory
+	if err := os.RemoveAll(skillDir); err != nil {
+		return fmt.Errorf("failed to remove skill directory: %w", err)
+	}
+
+	return nil
+}
+
 // Install creates symbolic links for all skills in the agent's skill directory
 func Install(agentSkillDir string) error {
 	skillsDir, err := GetSkillsDir()
