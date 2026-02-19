@@ -10,7 +10,7 @@ import (
 var downloadCmd = &cobra.Command{
 	Use:   "download [repository]",
 	Short: "Download a skill from a GitHub repository",
-	Long:  `Download a skill from a GitHub repository (e.g., tsubasaogawa/semantic-commit-helper)`,
+	Long:  `Download a skill from a GitHub repository (e.g., github.com/tsubasaogawa/semantic-commit-helper)`,
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		repo := args[0]
