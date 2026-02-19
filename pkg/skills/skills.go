@@ -14,7 +14,7 @@ func GetSkillsDir() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to get home directory: %w", err)
 	}
-	return filepath.Join(homeDir, ".local", "bin", "manage-agent-skills"), nil
+	return filepath.Join(homeDir, ".local", "src", "manage-agent-skills"), nil
 }
 
 // Download clones a GitHub repository to the skills directory
@@ -31,11 +31,11 @@ func Download(repo string) error {
 
 	// Store original input for error messages
 	originalInput := repo
-	
+
 	// Extract repository name from repo string (e.g., "github.com/tsubasaogawa/semantic-commit-helper" -> "semantic-commit-helper")
 	// Remove "github.com/" prefix if present
 	repo = strings.TrimPrefix(repo, "github.com/")
-	
+
 	parts := strings.Split(repo, "/")
 	if len(parts) != 2 {
 		return fmt.Errorf("invalid repository format: expected 'github.com/owner/repo', got '%s'", originalInput)
