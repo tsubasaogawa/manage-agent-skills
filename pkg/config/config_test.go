@@ -1,6 +1,8 @@
 package config
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"testing"
@@ -23,7 +25,28 @@ func TestGetConfigPath(t *testing.T) {
 	}
 }
 
-func TestLoad_NonExistentFile(t *testing.T) {
+func TestLoadDownloadsDefaultWhenMissing(t *testing.T) {
+	// Setup a test HTTP server to serve the default config
+	configContent := `# Configuration file for manage-agent-skills
+[agents]
+claude = "~/.claude/skills"
+codex = "~/.codex/skills"
+gemini = "~/.gemini/skills"
+copilot = "~/.copilot/skills"
+`
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(configContent))
+	}))
+	defer server.Close()
+
+	// Temporarily override the default URL
+	originalURL := DefaultConfigURL
+	DefaultConfigURL = server.URL
+	defer func() {
+		DefaultConfigURL = originalURL
+	}()
+
 	// Move existing config if it exists
 	configPath, err := GetConfigPath()
 	if err != nil {
@@ -37,17 +60,26 @@ func TestLoad_NonExistentFile(t *testing.T) {
 		if err := os.Rename(configPath, backupPath); err != nil {
 			t.Fatalf("Failed to backup config: %v", err)
 		}
-		defer func() {
+	}
+
+	// Cleanup after test
+	defer func() {
+		if configExists {
+			// Restore original config
 			if err := os.Rename(backupPath, configPath); err != nil {
 				t.Errorf("Failed to restore config: %v", err)
 			}
-		}()
-	}
+		} else {
+			// Clean up only the test config file
+			os.Remove(configPath)
+			// Only remove the directory if it's empty (no other files)
+			os.Remove(filepath.Dir(configPath))
+		}
+	}()
 
-	// This test assumes config file doesn't exist
 	cfg, err := Load()
 	if err != nil {
-		t.Fatalf("Load() with non-existent file should not fail: %v", err)
+		t.Fatalf("Load() failed: %v", err)
 	}
 
 	if cfg == nil {
@@ -58,13 +90,22 @@ func TestLoad_NonExistentFile(t *testing.T) {
 		t.Error("Load() returned config with nil Agents map")
 	}
 
-	if len(cfg.Agents) != 0 {
-		t.Errorf("Load() returned config with %d agents, want 0", len(cfg.Agents))
+	// Should have downloaded the default config with agents
+	if len(cfg.Agents) != 4 {
+		t.Errorf("Load() should have downloaded default config with 4 agents, got %d", len(cfg.Agents))
 	}
 
-	if !configExists {
-		// Clean up the test config directory if we created it
-		os.RemoveAll(filepath.Dir(configPath))
+	// Verify specific agents exist
+	expectedAgents := []string{"claude", "codex", "gemini", "copilot"}
+	for _, agent := range expectedAgents {
+		if _, exists := cfg.Agents[agent]; !exists {
+			t.Errorf("Expected agent %q not found in config", agent)
+		}
+	}
+
+	// Verify config file was created
+	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+		t.Error("Config file should have been created")
 	}
 }
 
