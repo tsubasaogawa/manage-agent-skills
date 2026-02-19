@@ -51,10 +51,10 @@ The repository includes a default configuration file (`config.toml`) with pre-co
 
 ```toml
 [agents]
-claude = "~/.claude/skills/"
-codex = "~/.codex/skills/"
-gemini = "~/.gemini/skills/"
-copilot = "~/.copilot/skills/"
+claude = "~/.claude/skills"
+codex = "~/.codex/skills"
+gemini = "~/.gemini/skills"
+copilot = "~/.copilot/skills"
 ```
 
 You can customize this file or create your own at `~/.config/manage-agent-skills/config.toml`. Each entry maps an agent name to its skills directory path.

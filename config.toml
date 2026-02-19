@@ -2,7 +2,7 @@
 # Define the skill directories for each agent
 
 [agents]
-claude = "~/.claude/skills/"
-codex = "~/.codex/skills/"
-gemini = "~/.gemini/skills/"
-copilot = "~/.copilot/skills/"
+claude = "~/.claude/skills"
+codex = "~/.codex/skills"
+gemini = "~/.gemini/skills"
+copilot = "~/.copilot/skills"
