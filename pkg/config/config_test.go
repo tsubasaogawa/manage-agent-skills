@@ -25,7 +25,7 @@ func TestGetConfigPath(t *testing.T) {
 	}
 }
 
-func TestLoad_NonExistentFile_DownloadsDefault(t *testing.T) {
+func TestLoadDownloadsDefaultWhenMissing(t *testing.T) {
 	// Setup a test HTTP server to serve the default config
 	configContent := `# Configuration file for manage-agent-skills
 [agents]
@@ -39,6 +39,13 @@ copilot = "~/.copilot/skills"
 		w.Write([]byte(configContent))
 	}))
 	defer server.Close()
+
+	// Temporarily override the default URL
+	originalURL := DefaultConfigURL
+	DefaultConfigURL = server.URL
+	defer func() {
+		DefaultConfigURL = originalURL
+	}()
 
 	// Move existing config if it exists
 	configPath, err := GetConfigPath()
@@ -60,14 +67,6 @@ copilot = "~/.copilot/skills"
 		}()
 	}
 
-	// Temporarily replace the download function to use our test server
-	// Since we can't easily inject the URL, we'll test the function indirectly
-	// by testing that the config directory gets created and a file is placed there
-
-	// Note: This test relies on network access to GitHub
-	// For a real scenario, we'd want to mock the HTTP call
-	// but for simplicity we'll test with the actual download
-	
 	if !configExists {
 		defer func() {
 			// Clean up the test config
@@ -77,12 +76,8 @@ copilot = "~/.copilot/skills"
 	}
 
 	cfg, err := Load()
-	// The actual download might fail if there's no network or GitHub is down
-	// In that case, we expect an error
 	if err != nil {
-		// This is acceptable if there's no network connectivity
-		t.Logf("Load() failed (possibly due to network): %v", err)
-		return
+		t.Fatalf("Load() failed: %v", err)
 	}
 
 	if cfg == nil {
@@ -94,8 +89,16 @@ copilot = "~/.copilot/skills"
 	}
 
 	// Should have downloaded the default config with agents
-	if len(cfg.Agents) == 0 {
-		t.Error("Load() should have downloaded default config with agents")
+	if len(cfg.Agents) != 4 {
+		t.Errorf("Load() should have downloaded default config with 4 agents, got %d", len(cfg.Agents))
+	}
+
+	// Verify specific agents exist
+	expectedAgents := []string{"claude", "codex", "gemini", "copilot"}
+	for _, agent := range expectedAgents {
+		if _, exists := cfg.Agents[agent]; !exists {
+			t.Errorf("Expected agent %q not found in config", agent)
+		}
 	}
 
 	// Verify config file was created

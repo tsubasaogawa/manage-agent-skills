@@ -15,6 +15,9 @@ type Config struct {
 	Agents map[string]string `toml:"agents"`
 }
 
+// DefaultConfigURL is the URL to download the default config from
+var DefaultConfigURL = "https://raw.githubusercontent.com/tsubasaogawa/manage-agent-skills/main/config.toml"
+
 // GetConfigPath returns the path to the config file
 func GetConfigPath() (string, error) {
 	homeDir, err := os.UserHomeDir()
@@ -26,17 +29,15 @@ func GetConfigPath() (string, error) {
 
 // downloadDefaultConfig downloads the default config from GitHub
 func downloadDefaultConfig(configPath string) error {
-	const configURL = "https://raw.githubusercontent.com/tsubasaogawa/manage-agent-skills/main/config.toml"
-
 	// Create directory if it doesn't exist
 	if err := os.MkdirAll(filepath.Dir(configPath), 0755); err != nil {
 		return fmt.Errorf("failed to create config directory: %w", err)
 	}
 
 	// Download the config file
-	resp, err := http.Get(configURL)
+	resp, err := http.Get(DefaultConfigURL)
 	if err != nil {
-		return fmt.Errorf("failed to download config from %s: %w", configURL, err)
+		return fmt.Errorf("failed to download config from %s: %w", DefaultConfigURL, err)
 	}
 	defer resp.Body.Close()
 
