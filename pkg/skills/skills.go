@@ -29,13 +29,16 @@ func Download(repo string) error {
 		return fmt.Errorf("failed to create skills directory: %w", err)
 	}
 
+	// Store original input for error messages
+	originalInput := repo
+	
 	// Extract repository name from repo string (e.g., "github.com/tsubasaogawa/semantic-commit-helper" -> "semantic-commit-helper")
 	// Remove "github.com/" prefix if present
 	repo = strings.TrimPrefix(repo, "github.com/")
 	
 	parts := strings.Split(repo, "/")
 	if len(parts) != 2 {
-		return fmt.Errorf("invalid repository format: expected 'github.com/owner/repo', got '%s'", repo)
+		return fmt.Errorf("invalid repository format: expected 'github.com/owner/repo', got '%s'", originalInput)
 	}
 	repoName := parts[1]
 
@@ -76,7 +79,7 @@ func List() ([]string, error) {
 		return nil, fmt.Errorf("failed to read skills directory: %w", err)
 	}
 
-	var skills []string
+	skills := []string{}
 	for _, entry := range entries {
 		if entry.IsDir() {
 			skills = append(skills, entry.Name())

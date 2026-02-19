@@ -42,9 +42,10 @@ func TestDownload_InvalidRepoFormat(t *testing.T) {
 		repo string
 	}{
 		{"no slash", "invalidrepo"},
-		{"only one slash", "owner/repo/extra/parts"},
+		{"too many parts", "owner/repo/extra/parts"},
 		{"empty", ""},
-		{"missing owner", "github.com/repo"},
+		{"missing repo name", "github.com/owner"},
+		{"only domain", "github.com/"},
 	}
 
 	for _, tt := range tests {
