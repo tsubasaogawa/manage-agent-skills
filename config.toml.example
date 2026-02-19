@@ -1,0 +1,10 @@
+# Configuration file for manage-agent-skills
+# Define the skill directories for each agent
+
+[agents]
+# Example agent configurations:
+# agent_name = "path/to/agent/skills/directory"
+
+# Example:
+# my-agent = "~/.local/share/my-agent/skills"
+# another-agent = "/opt/agents/another-agent/skills"
