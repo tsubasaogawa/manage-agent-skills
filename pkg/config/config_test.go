@@ -70,9 +70,10 @@ copilot = "~/.copilot/skills"
 				t.Errorf("Failed to restore config: %v", err)
 			}
 		} else {
-			// Clean up test config
+			// Clean up only the test config file
 			os.Remove(configPath)
-			os.RemoveAll(filepath.Dir(configPath))
+			// Only remove the directory if it's empty (no other files)
+			os.Remove(filepath.Dir(configPath))
 		}
 	}()
 
