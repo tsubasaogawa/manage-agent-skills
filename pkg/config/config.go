@@ -2,6 +2,8 @@ package config
 
 import (
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 
@@ -22,6 +24,41 @@ func GetConfigPath() (string, error) {
 	return filepath.Join(homeDir, ".config", "manage-agent-skills", "config.toml"), nil
 }
 
+// downloadDefaultConfig downloads the default config from GitHub
+func downloadDefaultConfig(configPath string) error {
+	const configURL = "https://raw.githubusercontent.com/tsubasaogawa/manage-agent-skills/main/config.toml"
+
+	// Create directory if it doesn't exist
+	if err := os.MkdirAll(filepath.Dir(configPath), 0755); err != nil {
+		return fmt.Errorf("failed to create config directory: %w", err)
+	}
+
+	// Download the config file
+	resp, err := http.Get(configURL)
+	if err != nil {
+		return fmt.Errorf("failed to download config from %s: %w", configURL, err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to download config: HTTP %d", resp.StatusCode)
+	}
+
+	// Create the config file
+	file, err := os.Create(configPath)
+	if err != nil {
+		return fmt.Errorf("failed to create config file: %w", err)
+	}
+	defer file.Close()
+
+	// Copy the content
+	if _, err := io.Copy(file, resp.Body); err != nil {
+		return fmt.Errorf("failed to write config file: %w", err)
+	}
+
+	return nil
+}
+
 // Load loads the configuration from config.toml
 func Load() (*Config, error) {
 	configPath, err := GetConfigPath()
@@ -29,12 +66,16 @@ func Load() (*Config, error) {
 		return nil, err
 	}
 
+	// Check if config file exists
+	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+		// Download default config from GitHub
+		if err := downloadDefaultConfig(configPath); err != nil {
+			return nil, fmt.Errorf("config file not found and failed to download default config: %w", err)
+		}
+	}
+
 	data, err := os.ReadFile(configPath)
 	if err != nil {
-		if os.IsNotExist(err) {
-			// Return empty config if file doesn't exist
-			return &Config{Agents: make(map[string]string)}, nil
-		}
 		return nil, fmt.Errorf("failed to read config file: %w", err)
 	}
 
