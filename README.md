@@ -25,6 +25,18 @@ Simplify the installation and management of agent skills.
 - Go 1.22 or later
 - Git
 
+### Download pre-built binaries
+
+Download the latest release binary for your platform from the [releases page](https://github.com/tsubasaogawa/manage-agent-skills/releases).
+
+Extract the archive and move the binary to your PATH:
+
+```bash
+# Example for Linux/macOS
+tar xzf manage-agent-skills_*.tar.gz
+sudo mv manage-agent-skills /usr/local/bin/
+```
+
 ### Build from source
 
 ```bash
@@ -141,6 +153,29 @@ go test ./...
 
 ```bash
 go build -o manage-agent-skills .
+```
+
+### Release
+
+This project uses [GoReleaser](https://goreleaser.com/) to automate the release process.
+
+To create a new release:
+
+1. Create and push a new tag:
+   ```bash
+   git tag -a v0.1.0 -m "Release v0.1.0"
+   git push origin v0.1.0
+   ```
+
+2. GitHub Actions will automatically:
+   - Build binaries for multiple platforms (Linux, macOS, Windows)
+   - Generate checksums
+   - Create a GitHub release with the binaries and changelog
+
+To test the release process locally without publishing:
+
+```bash
+goreleaser release --snapshot --clean
 ```
 
 ## License

@@ -26,3 +26,6 @@ coverage.txt
 # OS
 .DS_Store
 Thumbs.db
+
+# GoReleaser
+dist/
