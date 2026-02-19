@@ -24,6 +24,26 @@ func TestGetConfigPath(t *testing.T) {
 }
 
 func TestLoad_NonExistentFile(t *testing.T) {
+	// Move existing config if it exists
+	configPath, err := GetConfigPath()
+	if err != nil {
+		t.Fatalf("GetConfigPath() failed: %v", err)
+	}
+
+	backupPath := configPath + ".backup"
+	configExists := false
+	if _, err := os.Stat(configPath); err == nil {
+		configExists = true
+		if err := os.Rename(configPath, backupPath); err != nil {
+			t.Fatalf("Failed to backup config: %v", err)
+		}
+		defer func() {
+			if err := os.Rename(backupPath, configPath); err != nil {
+				t.Errorf("Failed to restore config: %v", err)
+			}
+		}()
+	}
+
 	// This test assumes config file doesn't exist
 	cfg, err := Load()
 	if err != nil {
@@ -40,6 +60,11 @@ func TestLoad_NonExistentFile(t *testing.T) {
 
 	if len(cfg.Agents) != 0 {
 		t.Errorf("Load() returned config with %d agents, want 0", len(cfg.Agents))
+	}
+
+	if !configExists {
+		// Clean up the test config directory if we created it
+		os.RemoveAll(filepath.Dir(configPath))
 	}
 }
 

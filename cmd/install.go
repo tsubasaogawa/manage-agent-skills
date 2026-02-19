@@ -15,21 +15,21 @@ var installCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		agentName := args[0]
-		
+
 		cfg, err := config.Load()
 		if err != nil {
 			return fmt.Errorf("failed to load config: %w", err)
 		}
-		
+
 		agentPath, exists := cfg.Agents[agentName]
 		if !exists {
 			return fmt.Errorf("agent '%s' not found in config", agentName)
 		}
-		
+
 		if err := skills.Install(agentPath); err != nil {
 			return fmt.Errorf("failed to install skills: %w", err)
 		}
-		
+
 		fmt.Printf("Successfully installed skills to agent '%s'\n", agentName)
 		return nil
 	},

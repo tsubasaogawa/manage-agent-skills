@@ -16,12 +16,12 @@ var listCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("failed to list skills: %w", err)
 		}
-		
+
 		if len(skillList) == 0 {
 			fmt.Println("No skills downloaded yet")
 			return nil
 		}
-		
+
 		fmt.Println("Downloaded skills:")
 		for _, skill := range skillList {
 			fmt.Printf("  - %s\n", skill)
